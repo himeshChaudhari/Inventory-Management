@@ -1,35 +1,33 @@
-# E-Commerce Inventory Management System
+# 7Heven - E-Commerce Inventory & Order Management System
 
-A beginner-friendly, decoupled API-driven mini-project for Pillai HOC College of Engineering and Technology (Dept. of Electronics and Computer Science).
+A modern, high-performance E-Commerce platform and Inventory Management System built with a decoupled architecture. Features a responsive customer storefront, a secure staff portal, and a comprehensive admin dashboard with real-time analytics.
 
-## Architecture Overview
-This project uses a modern decoupled architecture:
-- **Frontend (100% Pure HTML/CSS/JS):** The interface is built using Single-Page Application (SPA) principles with Vanilla JavaScript. No PHP is written inside the HTML files.
-- **Backend (100% Pure PHP):** The backend serves strictly as an API, receiving requests and returning raw JSON data.
-- **Database (MySQL):** Handles data persistence, ensuring relational integrity and atomic operations (like stock deduction during checkout).
+## Features
+
+- **Customer Storefront:** Browse products, live cart management, and seamless checkout with dynamic image handling.
+- **Admin Dashboard:** Visual analytics, sales trends, dead stock identification, and automated reorder suggestions.
+- **Staff Portal:** Order fulfillment processing, live stock alerts, and role-based access control (RBAC).
+- **Secure Backend:** PDO prepared statements, Bcrypt password hashing, and session fixation protection.
+- **Decoupled Architecture:** A clean separation of concerns using a PHP REST API backend and a pure HTML/CSS/JS frontend.
+
+## Architecture
+
+- **Frontend:** 100% Pure HTML/CSS/JS (Vanilla, No Frameworks). Single-Page Application (SPA) design.
+- **Backend:** 100% PHP (Vanilla). Operates strictly as a JSON REST API.
+- **Database:** MySQL relational database ensuring data consistency via soft deletes and transactional row-locking.
 
 ## Folder Structure
 
 ```
 sen5 mini project/
-├── css/
-│   └── style.css            # Global stylesheet
-├── js/
-│   ├── app.js               # Shared JS logic for Admin and Staff panels
-│   └── store.js             # JavaScript logic for the Customer Storefront
-├── includes/
-│   └── db.php               # PDO Database Connection String
-├── api/
-│   ├── backend.php          # Unified PHP API for Auth, Admin, and Staff tasks
-│   └── store_backend.php    # PHP API for Storefront and Checkout logic
-├── admin/
-│   └── index.html           # Admin Dashboard SPA
-├── staff/
-│   └── index.html           # Staff Dashboard SPA
-├── login.html               # Staff/Admin Login Page
-├── index.html               # Customer Storefront & Cart (Stage 5)
-├── database.sql             # SQL script to initialize DB and sample data
-└── README.md                # Project documentation
+├── css/                 # Global styling and CSS variables
+├── js/                  # SPA routing and frontend logic
+├── includes/            # PDO Database Connection
+├── api/                 # PHP API endpoints (Auth, Storefront, Admin)
+├── admin/               # Admin Dashboard view
+├── staff/               # Staff Dashboard view
+├── database.sql         # SQL script to initialize DB
+└── index.html           # Customer Storefront entry point
 ```
 
 ## Setup Instructions
@@ -60,12 +58,5 @@ sen5 mini project/
 - **Customer Storefront:** `http://localhost/sen5 mini project/index.html`
 - **System Login:** `http://localhost/sen5 mini project/login.html`
 
-## Default Credentials
-
-**Admin Account** (Full catalog management)
-- Username: `admin`
-- Password: `admin123`
-
-**Staff Account** (Read-only catalog, Order processing)
-- Username: `staff`
-- Password: `staff123`
+## License
+MIT License
