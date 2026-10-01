@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7Store - Staff Portal</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div class="logo" style="margin-bottom: 40px; padding: 0 16px;">
+                <div class="logo-tile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                7Store
+            </div>
+
+            <div style="padding: 0 16px; margin-bottom:24px;">
+                <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Signed in as</div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="width:8px; height:8px; border-radius:50%; background:var(--success);"></div>
+                    <span id="username-display" style="font-weight:600;"></span>
+                    <span class="badge badge-neutral" style="font-size:10px;">STAFF</span>
+                </div>
+            </div>
+
+            <a class="sidebar-link active" onclick="loadDashboard()">Dashboard</a>
+            <a class="sidebar-link" onclick="loadProducts()">View Stock</a>
+            <a class="sidebar-link" onclick="loadOrders()">Process Orders</a>
+            
+            <div style="margin-top:auto;">
+                <a href="../index.html" target="_blank" class="sidebar-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    Storefront
+                </a>
+                <a class="sidebar-link" onclick="logout()" style="color:var(--danger);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Logout
+                </a>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <!-- 1. Dashboard View -->
+            <div id="view-dashboard" class="view-section active" style="display:block;">
+                <h1 style="margin-bottom:32px;">Overview</h1>
+                <div class="grid-3" style="margin-bottom: 40px;">
+                    <div class="card">
+                        <h3 style="color:var(--text-muted); font-size:16px;">Pending Orders</h3>
+                        <h1 id="stat-pending" style="font-size:48px; margin-top:8px;">...</h1>
+                    </div>
+                    <div class="card">
+                        <h3 style="color:var(--text-muted); font-size:16px;">Low Stock Alerts</h3>
+                        <h1 id="stat-alerts" style="font-size:48px; margin-top:8px; color:var(--accent);">...</h1>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 24px;">Recent System Alerts</h3>
+                    <div id="alerts-list">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Products View -->
+            <div id="view-products" class="view-section">
+                <h1 style="margin-bottom:32px;">Active Stock</h1>
+                <div class="card">
+                    <table style="margin-top:0;">
+                        <thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Stock</th><th>Status</th></tr></thead>
+                        <tbody id="prod-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. Orders View -->
+            <div id="view-orders" class="view-section">
+                <h1 style="margin-bottom:32px;">Process Orders</h1>
+                <div class="card">
+                    <table style="margin-top:0;">
+                        <thead><tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+                        <tbody id="orders-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script>
+        enforceRole('staff').then(() => loadDashboard());
+
+        async function loadDashboard() {
+            showView('view-dashboard');
+            const data = await apiCall('staff_dashboard');
+            document.getElementById('stat-pending').innerText = data.pending_orders;
+            document.getElementById('stat-alerts').innerText = data.active_alerts;
+
+            const alertsList = document.getElementById('alerts-list');
+            if (data.recent_alerts.length === 0) {
+                alertsList.innerHTML = '<p style="color:var(--text-muted);">No recent alerts.</p>';
+            } else {
+                alertsList.innerHTML = data.recent_alerts.map(a => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0; border-bottom:1px solid var(--card-border);">
+                        <div>
+                            <span class="badge ${a.severity === 'Critical' ? 'badge-danger' : 'badge-warning'}">${a.severity}</span>
+                            <strong style="margin-left:12px;">${a.product_name}</strong>
+                            <span style="color:var(--text-muted); margin-left:8px;">${a.message}</span>
+                        </div>
+                        <span style="font-size:12px; color:var(--text-muted);">${a.created_at}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function loadProducts() {
+            showView('view-products');
+            const prods = await apiCall('get_store_products');
+            document.getElementById('prod-tbody').innerHTML = prods.map(p => `
+                <tr>
+                    <td style="font-family:monospace; color:var(--text-muted);">${p.sku}</td>
+                    <td style="font-weight:600;">${p.name}</td>
+                    <td><span class="badge badge-neutral">${p.category_name}</span></td>
+                    <td style="font-weight:800; color:${p.stock <= p.low_stock_threshold ? 'var(--danger)' : 'var(--success)'};">${p.stock}</td>
+                    <td>${p.stock > 0 ? 'Available' : 'Out of Stock'}</td>
+                </tr>`).join('');
+        }
+
+        async function loadOrders() {
+            showView('view-orders');
+            const orders = await apiCall('get_orders');
+            document.getElementById('orders-tbody').innerHTML = orders.map(o => {
+                const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+                let selectHtml = `<select onchange="updateStatus(${o.id}, this.value)" style="padding:8px; width:auto;">`;
+                statuses.forEach(s => {
+                    selectHtml += `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`;
+                });
+                selectHtml += `</select>`;
+
+                let badgeClass = 'badge-neutral';
+                if(o.status === 'Pending') badgeClass = 'badge-warning';
+                if(o.status === 'Delivered') badgeClass = 'badge-success';
+                if(o.status === 'Cancelled') badgeClass = 'badge-danger';
+
+                return `
+                <tr>
+                    <td style="font-weight:700;">#${o.id}</td>
+                    <td>
+                        <div>${o.customer_name}</div>
+                        <div style="font-size:12px; color:var(--text-muted);">${o.customer_phone}</div>
+                    </td>
+                    <td style="font-weight:700;">${formatINR(o.total_amount)}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span class="badge ${badgeClass}" style="width:90px; text-align:center;">${o.status}</span>
+                            ${selectHtml}
+                        </div>
+                    </td>
+                    <td style="font-size:14px; color:var(--text-muted);">${o.created_at}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function updateStatus(orderId, status) {
+            const res = await apiCall('update_order_status', { order_id: orderId, status: status });
+            if(res.success) {
+                showToast(`Order #${orderId} updated to ${status}`);
+                loadOrders();
+            } else {
+                showToast(res.error, 'error');
+                loadOrders();
+            }
+        }
+    </script>
+</body>
+</html>

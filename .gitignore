@@ -1,0 +1,8 @@
+# Environments
+.env
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
