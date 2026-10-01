@@ -34,14 +34,26 @@ sen5 mini project/
 
 ## Setup Instructions
 
-1. **Start WAMP:** Open WAMP Server and ensure all services are running (Green Icon).
-2. **Move Folder:** Ensure this entire project folder (`sen5 mini project`) is placed inside `C:\wamp64\www\`.
+1. **Clone the Repository:**
+   Navigate to your WAMP server's `www` directory and clone the project:
+   ```bash
+   cd C:\wamp64\www\
+   git clone https://github.com/himeshChaudhari/Inventory-Management.git "sen5 mini project"
+   ```
+2. **Start WAMP:** Open WAMP Server and ensure all services are running (Green Icon).
 3. **Database Setup:** 
    - Open `phpMyAdmin` (`http://localhost/phpmyadmin`).
    - Copy the contents of `database.sql` and paste it into the **SQL tab**.
    - Click **Go** to create the `inventory_system` database and populate the tables with sample data.
 4. **Database Credentials:** 
-   - Create a `.env` file in the root of the project and set `DB_PASS` to your MySQL password. A `.gitignore` file is included to prevent this from being uploaded.
+   - Create a `.env` file in the root of the project and set `DB_PASS` to your local MySQL password. 
+   - Example `.env` contents:
+     ```
+     DB_HOST=127.0.0.1
+     DB_NAME=inventory_system
+     DB_USER=root
+     DB_PASS=your_password_here
+     ```
 
 ## Accessing the Project
 
