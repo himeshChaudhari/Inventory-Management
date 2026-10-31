@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7Store - E-Commerce</title>
+    <title>Inventra - E-Commerce</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,7 +16,7 @@
                     <polyline points="2 12 12 17 22 12"></polyline>
                 </svg>
             </div>
-            7Store
+            Inventra
         </div>
         <div class="nav-links">
             <a href="#shop" class="active">Shop Products</a>
@@ -61,7 +61,8 @@
         </div>
     </div>
 
-    <div id="shop" class="container" style="padding-top: 100px;">
+    <!-- Shop Section -->
+    <div id="shop" class="container section-target" style="padding-top: 100px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; flex-wrap:wrap; gap:20px;">
             <div id="category-list" style="display:flex; gap:12px; flex-wrap:wrap;">
                 <!-- Filled by JS -->
@@ -82,7 +83,7 @@
     </div>
 
     <!-- How It Works Section -->
-    <div class="container" style="padding-top:100px;">
+    <div id="how" class="container section-target" style="padding-top:100px;">
         <h2 style="font-size:40px; margin-bottom:48px; text-align:center;">How it <span class="accent-text">works</span></h2>
         <div class="grid-3">
             <div class="card" style="text-align:center; padding:48px 32px;">
@@ -103,21 +104,53 @@
         </div>
     </div>
 
-    <!-- FAQ Section -->
-    <div class="container" style="padding-top:100px; padding-bottom:100px; max-width:800px;">
+    <!-- FAQ Section (Accordion) -->
+    <div id="faq" class="container section-target" style="padding-top:100px; padding-bottom:100px; max-width:800px;">
         <h2 style="font-size:40px; margin-bottom:48px; text-align:center;">Frequently Asked <span class="accent-text">Questions</span></h2>
-        <div style="display:flex; flex-direction:column; gap:16px;">
-            <div class="card" style="padding:24px;">
-                <h4 style="font-size:18px;">How accurate is the stock counter?</h4>
-                <p style="margin-top:12px; font-size:15px;">100% accurate. We use advanced database transactions to ensure the stock you see is exactly what is in the warehouse.</p>
+        <div class="faq-accordion" style="display:flex; flex-direction:column; gap:16px;">
+            <div class="card faq-item" style="padding:24px;">
+                <div class="faq-header">
+                    <h4 style="font-size:18px;">How accurate is the stock counter?</h4>
+                    <div class="faq-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </div>
+                <div class="faq-body">
+                    <p style="margin-top:14px; font-size:15px; color:var(--text-muted);">100% accurate. We execute atomic database transactions with row-level locking (SELECT ... FOR UPDATE) to guarantee that stock levels reflect real warehouse inventory in real time.</p>
+                </div>
             </div>
-            <div class="card" style="padding:24px;">
-                <h4 style="font-size:18px;">Can I cancel my order?</h4>
-                <p style="margin-top:12px; font-size:15px;">Yes, you can contact support. If an order is cancelled, our system automatically restores the stock immediately.</p>
+            <div class="card faq-item" style="padding:24px;">
+                <div class="faq-header">
+                    <h4 style="font-size:18px;">Can I cancel my order?</h4>
+                    <div class="faq-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </div>
+                <div class="faq-body">
+                    <p style="margin-top:14px; font-size:15px; color:var(--text-muted);">Yes, you can contact staff support. Whenever an order is marked as Cancelled, our system automatically replenishes reserved stock and records an audit log entry in the database.</p>
+                </div>
             </div>
-            <div class="card" style="padding:24px;">
-                <h4 style="font-size:18px;">How long does delivery take?</h4>
-                <p style="margin-top:12px; font-size:15px;">Usually within 2-3 business days. You can track your order status by logging into your account.</p>
+            <div class="card faq-item" style="padding:24px;">
+                <div class="faq-header">
+                    <h4 style="font-size:18px;">How long does delivery take?</h4>
+                    <div class="faq-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </div>
+                <div class="faq-body">
+                    <p style="margin-top:14px; font-size:15px; color:var(--text-muted);">Standard shipping typically takes 2-3 business days across India. Our warehouse staff immediately updates fulfillment tracking as soon as your parcel is packed and dispatched.</p>
+                </div>
+            </div>
+            <div class="card faq-item" style="padding:24px;">
+                <div class="faq-header">
+                    <h4 style="font-size:18px;">What payment methods are supported?</h4>
+                    <div class="faq-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </div>
+                <div class="faq-body">
+                    <p style="margin-top:14px; font-size:15px; color:var(--text-muted);">We support UPI, Net Banking, major credit/debit cards, and Cash on Delivery (COD) for eligible domestic shipping pin codes.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -132,37 +165,50 @@
                     <polyline points="2 12 12 17 22 12"></polyline>
                 </svg>
             </div>
-            7Store
+            Inventra
         </div>
-        <p style="margin:0 auto; font-size:14px;">&copy; 2026 7Store Inventory Systems. Built for performance.</p>
+        <p style="margin:0 auto; font-size:14px;">&copy; 2026 Inventra Inventory Systems. Built for performance.</p>
     </footer>
 
     <!-- Cart Overlay & Drawer -->
     <div id="cart-overlay" class="cart-overlay" onclick="toggleCart()"></div>
     <div id="cart-modal">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
             <h2 style="font-size:24px;">Your Cart</h2>
             <button onclick="toggleCart()" style="background:none; font-size:24px; color:var(--text-muted);">&times;</button>
         </div>
         
-        <div id="cart-items" style="flex:1; overflow-y:auto; margin-bottom:24px;">
+        <div id="cart-items" style="flex:1; overflow-y:auto; margin-bottom:24px; padding-right:4px;">
             <!-- Filled by JS -->
         </div>
 
-        <div style="border-top:2px solid var(--card-border); padding-top:24px;">
+        <div style="border-top:2px solid var(--card-border); padding-top:20px;">
             <button id="show-checkout-btn" class="btn-primary" onclick="showCheckoutForm()" style="width:100%; justify-content:center; display:none;">Proceed to Checkout</button>
             
             <form id="checkout-form" onsubmit="submitOrder(event)" style="display:none; flex-direction:column; gap:12px;">
-                <input type="text" id="cust-name" placeholder="Full Name" required>
-                <input type="email" id="cust-email" placeholder="Email Address" required>
-                <input type="text" id="cust-phone" placeholder="Phone Number" required>
-                <input type="text" id="cust-address" placeholder="Shipping Address" required>
-                <button type="submit" class="btn-primary" style="width:100%; justify-content:center; margin-top:8px;">Confirm Order</button>
+                <div>
+                    <input type="text" id="cust-name" placeholder="Full Name" required>
+                    <div id="cust-name-error" class="field-error"></div>
+                </div>
+                <div>
+                    <input type="email" id="cust-email" placeholder="Email Address (e.g. name@gmail.com)" required>
+                    <div id="cust-email-error" class="field-error"></div>
+                </div>
+                <div>
+                    <input type="text" id="cust-phone" placeholder="Phone Number (10 digits)" inputmode="numeric" maxlength="10" required>
+                    <div id="cust-phone-error" class="field-error"></div>
+                </div>
+                <div>
+                    <input type="text" id="cust-address" placeholder="Shipping Address" required>
+                    <div id="cust-address-error" class="field-error"></div>
+                </div>
+                <button type="submit" id="checkout-submit-btn" class="btn-primary" style="width:100%; justify-content:center; margin-top:8px;">Confirm Order</button>
             </form>
         </div>
     </div>
 
     <script src="js/app.js"></script>
+    <script src="js/validators.js"></script>
     <script src="js/store.js"></script>
 </body>
 </html>

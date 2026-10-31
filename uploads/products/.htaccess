@@ -1,0 +1,6 @@
+# Disable PHP script execution in uploads directory
+<FilesMatch "\.(?i:php|phtml|php[0-9]|phps)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+php_flag engine off

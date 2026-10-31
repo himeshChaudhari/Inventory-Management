@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7Store - Admin Dashboard</title>
+    <title>Inventra - Admin Dashboard</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
@@ -17,7 +17,7 @@
                         <polyline points="2 12 12 17 22 12"></polyline>
                     </svg>
                 </div>
-                7Store
+                Inventra
             </div>
 
             <div style="padding: 0 16px; margin-bottom:24px;">
@@ -51,26 +51,40 @@
 
         <main class="admin-content">
             
-            <!-- 1. Dashboard View -->
+            <!-- 1. Dashboard View (Stat Cards Clickable) -->
             <div id="view-dashboard" class="view-section active" style="display:block;">
                 <h1 style="margin-bottom:32px;">Overview</h1>
                 <div class="grid-3">
-                    <div class="card">
-                        <h3 style="color:var(--text-muted); font-size:16px;">Total Products</h3>
+                    <div class="card stat-card" onclick="loadProducts()" tabindex="0" role="link" aria-label="View Products" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); loadProducts();}">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <h3 style="color:var(--text-muted); font-size:16px;">Total Products</h3>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                        </div>
                         <h1 id="stat-products" style="font-size:48px; margin-top:8px;">...</h1>
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Click to manage catalog &rarr;</span>
                     </div>
-                    <div class="card">
-                        <h3 style="color:var(--text-muted); font-size:16px;">Total Orders</h3>
+
+                    <div class="card stat-card" onclick="loadOrders()" tabindex="0" role="link" aria-label="View Orders" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); loadOrders();}">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <h3 style="color:var(--text-muted); font-size:16px;">Total Orders</h3>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                        </div>
                         <h1 id="stat-orders" style="font-size:48px; margin-top:8px;">...</h1>
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Click to view orders &rarr;</span>
                     </div>
-                    <div class="card">
-                        <h3 style="color:var(--text-muted); font-size:16px;">Staff Members</h3>
+
+                    <div class="card stat-card" onclick="loadStaff()" tabindex="0" role="link" aria-label="View Staff" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); loadStaff();}">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <h3 style="color:var(--text-muted); font-size:16px;">Staff Members</h3>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                        </div>
                         <h1 id="stat-staff" style="font-size:48px; margin-top:8px;">...</h1>
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Click to manage team &rarr;</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Analytics View -->
+            <!-- Analytics View (Fixed Sales Trend Chart) -->
             <div id="view-analytics" class="view-section">
                 <h1 style="margin-bottom:32px;">Business Analytics</h1>
                 
@@ -97,8 +111,8 @@
                 </div>
                 
                 <div class="card">
-                    <h3 style="margin-bottom: 24px;">Sales Trend (Last 7 Days)</h3>
-                    <div id="sales-chart" class="bar-chart-container">
+                    <h3 style="margin-bottom: 20px;">Sales Trend (Last 7 Days)</h3>
+                    <div id="sales-chart">
                         <!-- Filled by JS -->
                     </div>
                 </div>
@@ -138,12 +152,12 @@
                 </div>
             </div>
 
-            <!-- Products View -->
+            <!-- Products View (Image Required on Add, Optional on Edit) -->
             <div id="view-products" class="view-section">
                 <h1 style="margin-bottom:32px;">Products</h1>
                 <div class="card" style="margin-bottom: 32px;">
                     <h3 style="margin-bottom: 16px;">Add / Edit Product</h3>
-                    <form id="prod-form" class="grid-3">
+                    <form id="prod-form" class="grid-3" enctype="multipart/form-data">
                         <input type="hidden" id="prod-id" value="0">
                         <input type="text" id="prod-sku" placeholder="SKU" required>
                         <input type="text" id="prod-name" placeholder="Product Name" required>
@@ -152,15 +166,42 @@
                         <input type="number" id="prod-stock" placeholder="Initial Stock" required>
                         <input type="number" id="prod-thresh" placeholder="Low Stock Threshold" required>
                         <input type="text" id="prod-desc" placeholder="Description" style="grid-column: 1 / span 2;">
-                        <div style="display:flex; gap:12px;">
-                            <button type="submit" class="btn-primary" style="flex:1;">Save</button>
-                            <button type="button" class="btn-secondary" onclick="document.getElementById('prod-form').reset(); document.getElementById('prod-id').value=0;">Clear</button>
+                        
+                        <!-- Image Upload Container -->
+                        <div style="grid-column: 1 / -1; background: var(--bg-color); padding: 18px 20px; border-radius: var(--radius-sm); border: 1px dashed var(--card-border);">
+                            <label style="display:block; font-size:13px; font-weight:700; margin-bottom:8px; color:var(--text-main);">
+                                Product Image <span id="prod-image-req" style="color:var(--danger);">(Required for new products)</span>
+                            </label>
+                            <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+                                <input type="file" id="prod-image" accept=".jpg,.jpeg,.png,.webp" style="flex:1; min-width:240px; padding:10px; background:#fff;">
+                                <div id="image-preview-wrapper" style="display:none; align-items:center; gap:12px;">
+                                    <img id="image-preview" src="" alt="Preview" style="width:52px; height:52px; object-fit:cover; border-radius:var(--radius-sm); border:1px solid var(--card-border);">
+                                    <span id="image-preview-caption" style="font-size:12px; color:var(--text-muted); font-weight:600;"></span>
+                                </div>
+                            </div>
+                            <div id="prod-image-error" class="field-error"></div>
+                        </div>
+
+                        <div style="display:flex; gap:12px; grid-column: 1 / -1;">
+                            <button type="submit" id="prod-save-btn" class="btn-primary" style="flex:1; justify-content:center;">Save Product</button>
+                            <button type="button" class="btn-secondary" onclick="resetProdForm()">Clear Form</button>
                         </div>
                     </form>
                 </div>
                 <div class="card">
                     <table style="margin-top:0;">
-                        <thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>SKU</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                         <tbody id="prod-tbody"></tbody>
                     </table>
                 </div>
@@ -177,20 +218,36 @@
                 </div>
             </div>
 
-            <!-- Staff View -->
+            <!-- Staff View (With Email & Phone Validation) -->
             <div id="view-staff" class="view-section">
                 <h1 style="margin-bottom:32px;">Manage Staff</h1>
                 <div class="card" style="margin-bottom: 32px;">
                     <h3 style="margin-bottom: 16px;">Add Staff Member</h3>
-                    <form id="staff-form" style="display:flex; gap:16px;">
-                        <input type="text" id="staff-user" placeholder="Username" required>
-                        <input type="password" id="staff-pass" placeholder="Temporary Password" required>
-                        <button type="submit" class="btn-primary">Add Staff</button>
+                    <form id="staff-form" class="grid-2" style="gap:16px;">
+                        <div>
+                            <input type="text" id="staff-user" placeholder="Username" required>
+                            <div id="staff-user-error" class="field-error"></div>
+                        </div>
+                        <div>
+                            <input type="email" id="staff-email" placeholder="Staff Email Address" required>
+                            <div id="staff-email-error" class="field-error"></div>
+                        </div>
+                        <div>
+                            <input type="text" id="staff-phone" placeholder="Phone Number (10 digits)" inputmode="numeric" maxlength="10" required>
+                            <div id="staff-phone-error" class="field-error"></div>
+                        </div>
+                        <div>
+                            <input type="password" id="staff-pass" placeholder="Temporary Password" required>
+                            <div id="staff-pass-error" class="field-error"></div>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <button type="submit" id="staff-submit-btn" class="btn-primary" style="width:100%; justify-content:center;">Add Staff Member</button>
+                        </div>
                     </form>
                 </div>
                 <div class="card">
                     <table style="margin-top:0;">
-                        <thead><tr><th>ID</th><th>Username</th><th>Role</th><th>Created</th></tr></thead>
+                        <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Created</th></tr></thead>
                         <tbody id="staff-tbody"></tbody>
                     </table>
                 </div>
@@ -200,8 +257,15 @@
     </div>
 
     <script src="../js/app.js"></script>
+    <script src="../js/validators.js"></script>
     <script>
-        enforceRole('admin').then(() => loadDashboard());
+        enforceRole('admin').then(() => {
+            loadDashboard();
+            setupStaffFormValidation();
+            setupProductImageValidation();
+        });
+
+        let currentTrendData = [];
 
         async function loadDashboard() {
             showView('view-dashboard');
@@ -215,26 +279,76 @@
             showView('view-analytics');
             const data = await apiCall('get_analytics');
             document.getElementById('stat-revenue').innerText = formatINR(data.revenue);
-            document.getElementById('best-tbody').innerHTML = data.best.map(b => `<tr><td style="font-weight:600;">${b.name}</td><td><span class="badge badge-neutral">${b.sold} units</span></td></tr>`).join('');
-            document.getElementById('dead-tbody').innerHTML = data.dead.map(d => `<tr><td style="font-weight:600;">${d.name}</td><td><span class="badge badge-warning">${d.stock} units</span></td></tr>`).join('');
+            document.getElementById('best-tbody').innerHTML = (data.best || []).map(b => `<tr><td style="font-weight:600;">${b.name}</td><td><span class="badge badge-neutral">${b.sold} units</span></td></tr>`).join('');
+            document.getElementById('dead-tbody').innerHTML = (data.dead || []).map(d => `<tr><td style="font-weight:600;">${d.name}</td><td><span class="badge badge-warning">${d.stock} units</span></td></tr>`).join('');
             
-            const chart = document.getElementById('sales-chart');
-            if (data.trend.length === 0) {
-                chart.innerHTML = '<p style="color:var(--text-muted); padding:40px;">No sales data in last 7 days.</p>';
-            } else {
-                const maxTotal = Math.max(...data.trend.map(t => t.total));
-                chart.innerHTML = data.trend.map(t => {
-                    const height = (t.total / maxTotal) * 100;
-                    return `
-                        <div class="bar-wrapper">
-                            <span class="bar-value">${formatINR(t.total)}</span>
-                            <div class="bar" style="height:${height}%;"></div>
-                            <span class="bar-label">${t.date.slice(5)}</span>
-                        </div>
-                    `;
-                }).join('');
-            }
+            currentTrendData = data.trend || [];
+            renderSalesChart(currentTrendData);
         }
+
+        // 2. Sales Trend Chart Renderer
+        function renderSalesChart(trend) {
+            const chart = document.getElementById('sales-chart');
+            if (!trend || trend.length === 0) {
+                chart.innerHTML = '<div style="padding:48px; text-align:center; color:var(--text-muted);"><p style="font-weight:600;">No sales in the last 7 days</p></div>';
+                return;
+            }
+
+            const totalSales = trend.reduce((sum, item) => sum + (Number(item.total) || 0), 0);
+            if (totalSales <= 0) {
+                chart.innerHTML = `
+                    <div style="padding:48px 20px; text-align:center; color:var(--text-muted); width:100%;">
+                        <p style="font-size:16px; font-weight:700; color:var(--text-main); margin-bottom:6px;">No sales in the last 7 days</p>
+                        <span style="font-size:13px;">New orders placed in the store will automatically appear here.</span>
+                    </div>
+                `;
+                return;
+            }
+
+            const maxTotal = Math.max(...trend.map(t => Number(t.total) || 0), 1);
+            const midTotal = maxTotal / 2;
+
+            const yAxis = `
+                <div class="chart-y-axis">
+                    <span>${formatINR(maxTotal)}</span>
+                    <span>${formatINR(midTotal)}</span>
+                    <span>Rs. 0</span>
+                </div>
+            `;
+
+            const bars = trend.map(t => {
+                const total = Number(t.total) || 0;
+                const height = total > 0 ? Math.max(Math.round((total / maxTotal) * 100), 5) : 0;
+                const dateObj = new Date(t.date + 'T00:00:00');
+                const dayName = dateObj.toLocaleDateString('en-IN', { weekday: 'short' });
+                const dayNum = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+                return `
+                    <div class="bar-wrapper" tabindex="0" role="img" aria-label="${dayName}, ${dayNum}: ${formatINR(total)}">
+                        <div class="bar-tooltip">${dayName}, ${dayNum}<br><strong>${formatINR(total)}</strong></div>
+                        <div class="bar" style="height:${height}%;"></div>
+                        <span class="bar-label"><strong>${dayName}</strong><br>${dayNum}</span>
+                    </div>
+                `;
+            }).join('');
+
+            chart.innerHTML = `
+                <div class="chart-container-box">
+                    ${yAxis}
+                    <div class="bar-chart-container">
+                        ${bars}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Resize handler for chart
+        window.addEventListener('resize', () => {
+            const analyticsView = document.getElementById('view-analytics');
+            if (analyticsView && analyticsView.style.display === 'block' && currentTrendData.length > 0) {
+                renderSalesChart(currentTrendData);
+            }
+        });
 
         async function loadReorder() {
             showView('view-reorder');
@@ -273,10 +387,17 @@
 
         async function loadProducts() {
             showView('view-products');
-            loadCategories(true); // populate dropdown without switching view
+            loadCategories(true);
             const prods = await apiCall('get_products');
-            document.getElementById('prod-tbody').innerHTML = prods.map(p => `
+            document.getElementById('prod-tbody').innerHTML = prods.map(p => {
+                const imgSrc = p.image_path ? `../${p.image_path}` : '';
+                const imgCell = imgSrc 
+                    ? `<img src="${imgSrc}" alt="${p.name}" style="width:40px; height:40px; object-fit:cover; border-radius:var(--radius-sm); border:1px solid var(--card-border);">` 
+                    : `<div class="product-img-placeholder" style="width:40px; height:40px; font-size:14px; margin-bottom:0; border-radius:var(--radius-sm);">${(p.name || 'P').charAt(0).toUpperCase()}</div>`;
+
+                return `
                 <tr>
+                    <td>${imgCell}</td>
                     <td style="font-family:monospace; color:var(--text-muted);">${p.sku}</td>
                     <td style="font-weight:600;">${p.name}</td>
                     <td><span class="badge badge-neutral">${p.cat_name}</span></td>
@@ -289,7 +410,55 @@
                             <button class="btn-secondary" style="padding:6px 12px; font-size:12px; border-color:${p.is_active ? 'var(--danger)' : 'var(--success)'}; color:${p.is_active ? 'var(--danger)' : 'var(--success)'};" onclick='toggleProd(${p.id})'>${p.is_active ? 'Deactivate' : 'Activate'}</button>
                         </div>
                     </td>
-                </tr>`).join('');
+                </tr>`;
+            }).join('');
+        }
+
+        // 4. Product Image Validation & Preview Setup
+        function setupProductImageValidation() {
+            const fileInput = document.getElementById('prod-image');
+            const errorEl = document.getElementById('prod-image-error');
+            const previewWrapper = document.getElementById('image-preview-wrapper');
+            const previewImg = document.getElementById('image-preview');
+            const previewCap = document.getElementById('image-preview-caption');
+
+            fileInput.addEventListener('change', () => {
+                const file = fileInput.files[0];
+                if (!file) {
+                    if (document.getElementById('prod-id').value == 0) {
+                        setFieldError(fileInput, errorEl, 'Please upload a product image.');
+                    } else {
+                        setFieldNeutral(fileInput, errorEl);
+                    }
+                    return;
+                }
+                const res = validateImageFile(file);
+                if (!res.valid) {
+                    setFieldError(fileInput, errorEl, res.error);
+                    fileInput.value = '';
+                    previewWrapper.style.display = 'none';
+                } else {
+                    setFieldSuccess(fileInput, errorEl);
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewImg.src = e.target.result;
+                        previewCap.textContent = `New upload (${Math.round(file.size / 1024)} KB)`;
+                        previewWrapper.style.display = 'flex';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function resetProdForm() {
+            document.getElementById('prod-form').reset();
+            document.getElementById('prod-id').value = 0;
+            document.getElementById('prod-image-req').textContent = '(Required for new products)';
+            document.getElementById('image-preview-wrapper').style.display = 'none';
+            document.getElementById('image-preview').src = '';
+            const errorEl = document.getElementById('prod-image-error');
+            if (errorEl) { errorEl.textContent = ''; errorEl.style.display = 'none'; }
+            document.getElementById('prod-image').classList.remove('is-invalid', 'is-valid');
         }
 
         function editProd(p) {
@@ -300,22 +469,74 @@
             document.getElementById('prod-price').value = p.price;
             document.getElementById('prod-stock').value = p.stock;
             document.getElementById('prod-thresh').value = p.low_stock_threshold;
-            document.getElementById('prod-desc').value = p.description;
+            document.getElementById('prod-desc').value = p.description || '';
+            
+            document.getElementById('prod-image-req').textContent = '(Optional on edit - leave empty to keep current)';
+            const previewWrapper = document.getElementById('image-preview-wrapper');
+            const previewImg = document.getElementById('image-preview');
+            const previewCap = document.getElementById('image-preview-caption');
+            const errorEl = document.getElementById('prod-image-error');
+            if (errorEl) { errorEl.textContent = ''; errorEl.style.display = 'none'; }
+            document.getElementById('prod-image').classList.remove('is-invalid', 'is-valid');
+
+            if (p.image_path) {
+                previewImg.src = '../' + p.image_path;
+                previewCap.textContent = 'Current Image';
+                previewWrapper.style.display = 'flex';
+            } else {
+                previewWrapper.style.display = 'none';
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         document.getElementById('prod-form').onsubmit = async (e) => {
             e.preventDefault();
-            const res = await apiCall('save_product', {
-                id: document.getElementById('prod-id').value, sku: document.getElementById('prod-sku').value,
-                name: document.getElementById('prod-name').value, cat_id: document.getElementById('prod-cat').value,
-                price: document.getElementById('prod-price').value, stock: document.getElementById('prod-stock').value,
-                threshold: document.getElementById('prod-thresh').value, desc: document.getElementById('prod-desc').value
-            });
-            if(res.success) {
-                document.getElementById('prod-form').reset(); 
-                document.getElementById('prod-id').value = 0;
-                showToast('Product saved.');
+            const prodId = document.getElementById('prod-id').value;
+            const fileInput = document.getElementById('prod-image');
+            const errorEl = document.getElementById('prod-image-error');
+            const file = fileInput.files[0];
+
+            // Image is required for new products
+            if (prodId == 0 && !file) {
+                setFieldError(fileInput, errorEl, 'Please upload a product image.');
+                fileInput.focus();
+                return;
+            }
+
+            if (file) {
+                const check = validateImageFile(file);
+                if (!check.valid) {
+                    setFieldError(fileInput, errorEl, check.error);
+                    fileInput.focus();
+                    return;
+                }
+            }
+
+            const formData = new FormData();
+            formData.append('id', prodId);
+            formData.append('sku', document.getElementById('prod-sku').value.trim());
+            formData.append('name', document.getElementById('prod-name').value.trim());
+            formData.append('cat_id', document.getElementById('prod-cat').value);
+            formData.append('price', document.getElementById('prod-price').value);
+            formData.append('stock', document.getElementById('prod-stock').value);
+            formData.append('threshold', document.getElementById('prod-thresh').value);
+            formData.append('desc', document.getElementById('prod-desc').value.trim());
+            if (file) {
+                formData.append('image', file);
+            }
+
+            const btn = document.getElementById('prod-save-btn');
+            const orig = btn.innerHTML;
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            const res = await apiCall('save_product', formData);
+            btn.innerHTML = orig;
+            btn.disabled = false;
+
+            if (res.success) {
+                resetProdForm();
+                showToast('Product saved successfully.');
                 loadProducts();
             } else {
                 showToast(res.error, 'error');
@@ -341,6 +562,7 @@
                     <td style="font-weight:700;">#${o.id}</td>
                     <td>
                         <div style="font-weight:600;">${o.customer_name}</div>
+                        <div style="font-size:12px; color:var(--text-muted);">${o.customer_phone || ''}</div>
                     </td>
                     <td style="font-weight:700;">${formatINR(o.total_amount)}</td>
                     <td><span class="badge ${badgeClass}">${o.status}</span></td>
@@ -356,19 +578,80 @@
                 <tr>
                     <td style="font-family:monospace; color:var(--text-muted);">${s.id}</td>
                     <td style="font-weight:600;">${s.username}</td>
+                    <td>${s.email || '-'}</td>
+                    <td>${s.phone || '-'}</td>
                     <td><span class="badge badge-neutral">${s.role}</span></td>
                     <td style="font-size:14px; color:var(--text-muted);">${s.created_at}</td>
                 </tr>`).join('');
         }
 
+        // 5 & 6. Staff Form Validation Setup
+        function setupStaffFormValidation() {
+            const emailInput = document.getElementById('staff-email');
+            const emailError = document.getElementById('staff-email-error');
+            const phoneInput = document.getElementById('staff-phone');
+            const phoneError = document.getElementById('staff-phone-error');
+
+            if (emailInput && emailError) {
+                attachEmailValidator(emailInput, emailError);
+            }
+            if (phoneInput && phoneError) {
+                attachPhoneValidator(phoneInput, phoneError);
+            }
+        }
+
         document.getElementById('staff-form').onsubmit = async (e) => {
             e.preventDefault();
-            const res = await apiCall('add_staff', { username: document.getElementById('staff-user').value, password: document.getElementById('staff-pass').value });
+            const userInput = document.getElementById('staff-user');
+            const emailInput = document.getElementById('staff-email');
+            const phoneInput = document.getElementById('staff-phone');
+            const passInput = document.getElementById('staff-pass');
+
+            const emailError = document.getElementById('staff-email-error');
+            const phoneError = document.getElementById('staff-phone-error');
+
+            const emailCheck = validateEmail(emailInput.value);
+            if (!emailCheck.valid) {
+                setFieldError(emailInput, emailError, emailCheck.error);
+                emailInput.focus();
+                return;
+            } else {
+                setFieldSuccess(emailInput, emailError);
+            }
+
+            const phoneCheck = validatePhoneNumber(phoneInput.value);
+            if (!phoneCheck.valid) {
+                setFieldError(phoneInput, phoneError, phoneCheck.error);
+                phoneInput.focus();
+                return;
+            } else {
+                setFieldSuccess(phoneInput, phoneError);
+            }
+
+            const btn = document.getElementById('staff-submit-btn');
+            const orig = btn.innerHTML;
+            btn.innerHTML = 'Adding...';
+            btn.disabled = true;
+
+            const res = await apiCall('add_staff', {
+                username: userInput.value.trim(),
+                email: emailCheck.clean,
+                phone: phoneCheck.clean,
+                password: passInput.value
+            });
+
+            btn.innerHTML = orig;
+            btn.disabled = false;
+
             if (res.success) { 
-                document.getElementById('staff-form').reset(); 
-                showToast('Staff member added.');
+                document.getElementById('staff-form').reset();
+                setFieldNeutral(emailInput, emailError);
+                setFieldNeutral(phoneInput, phoneError);
+                showToast('Staff member added successfully.');
                 loadStaff(); 
-            } else showToast(res.error, 'error');
+            } else {
+                showToast(res.error, 'error');
+            }
         };
     </script>
 </body>

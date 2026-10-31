@@ -6,9 +6,13 @@ $envPath = __DIR__ . '/../.env';
 if (file_exists($envPath)) {
     $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue;
-        list($name, $value) = explode('=', $line, 2);
-        putenv(trim($name) . '=' . trim($value));
+        $trimmed = trim($line);
+        if ($trimmed === '' || strpos($trimmed, '#') === 0) continue;
+        if (strpos($trimmed, '=') !== false) {
+            list($name, $value) = explode('=', $trimmed, 2);
+            putenv(trim($name) . '=' . trim($value));
+            $_ENV[trim($name)] = trim($value);
+        }
     }
 }
 
@@ -27,7 +31,32 @@ $options = [
 
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
+
+    // Auto-migrate schema updates if missing so user never encounters 'unknown column' errors
+    try {
+        // 1. Ensure products.image_path exists
+        $colCheck = $pdo->query("SHOW COLUMNS FROM products LIKE 'image_path'")->fetch();
+        if (!$colCheck) {
+            $pdo->exec("ALTER TABLE products ADD COLUMN image_path VARCHAR(255) NULL AFTER low_stock_threshold");
+        }
+
+        // 2. Ensure users.email and users.phone exist
+        $userEmailCheck = $pdo->query("SHOW COLUMNS FROM users LIKE 'email'")->fetch();
+        if (!$userEmailCheck) {
+            $pdo->exec("ALTER TABLE users ADD COLUMN email VARCHAR(100) NULL UNIQUE AFTER username");
+            $pdo->exec("ALTER TABLE users ADD COLUMN phone VARCHAR(20) NULL AFTER email");
+            $pdo->exec("UPDATE users SET email = 'admin@inventra.com', phone = '9876543210' WHERE username = 'admin'");
+            $pdo->exec("UPDATE users SET email = 'staff@inventra.com', phone = '9876543211' WHERE username = 'staff'");
+        }
+    } catch (\Exception $migErr) {
+        // Silently continue if tables do not exist yet or query already completed
+    }
+
 } catch (\PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    if (php_sapi_name() !== 'cli' && (!headers_sent())) {
+        header('Content-Type: application/json');
+    }
+    echo json_encode(['success' => false, 'error' => 'Database connection failed: ' . $e->getMessage()]);
+    exit;
 }
 ?>

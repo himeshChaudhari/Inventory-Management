@@ -1,4 +1,4 @@
-# Environments
+﻿# Environments
 .env
 
 # MacOS
@@ -6,3 +6,8 @@
 
 # Windows
 Thumbs.db
+
+# Uploaded user media
+uploads/products/*
+!uploads/products/.htaccess
+!uploads/products/.gitkeep

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7Store - Staff Portal</title>
+    <title>Inventra - Staff Portal</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
@@ -17,7 +17,7 @@
                         <polyline points="2 12 12 17 22 12"></polyline>
                     </svg>
                 </div>
-                7Store
+                Inventra
             </div>
 
             <div style="padding: 0 16px; margin-bottom:24px;">
@@ -73,7 +73,16 @@
                 <h1 style="margin-bottom:32px;">Active Stock</h1>
                 <div class="card">
                     <table style="margin-top:0;">
-                        <thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Stock</th><th>Status</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>SKU</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
                         <tbody id="prod-tbody"></tbody>
                     </table>
                 </div>
@@ -98,20 +107,22 @@
 
         async function loadDashboard() {
             showView('view-dashboard');
-            const data = await apiCall('staff_dashboard');
-            document.getElementById('stat-pending').innerText = data.pending_orders;
-            document.getElementById('stat-alerts').innerText = data.active_alerts;
+            const data = await apiCall('staff_stats');
+            document.getElementById('stat-pending').innerText = data.pending ?? '0';
+            
+            const alerts = data.alerts || [];
+            document.getElementById('stat-alerts').innerText = alerts.length;
 
             const alertsList = document.getElementById('alerts-list');
-            if (data.recent_alerts.length === 0) {
-                alertsList.innerHTML = '<p style="color:var(--text-muted);">No recent alerts.</p>';
+            if (alerts.length === 0) {
+                alertsList.innerHTML = '<p style="color:var(--text-muted);">No active stock alerts.</p>';
             } else {
-                alertsList.innerHTML = data.recent_alerts.map(a => `
+                alertsList.innerHTML = alerts.map(a => `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0; border-bottom:1px solid var(--card-border);">
                         <div>
-                            <span class="badge ${a.severity === 'Critical' ? 'badge-danger' : 'badge-warning'}">${a.severity}</span>
-                            <strong style="margin-left:12px;">${a.product_name}</strong>
-                            <span style="color:var(--text-muted); margin-left:8px;">${a.message}</span>
+                            <span class="badge ${a.alert_level === 'Critical' || a.alert_level === 'Out of stock' ? 'badge-danger' : 'badge-warning'}">${a.alert_level}</span>
+                            <strong style="margin-left:12px;">${a.p_name}</strong>
+                            <span style="color:var(--text-muted); margin-left:8px;">(Current stock: ${a.stock})</span>
                         </div>
                         <span style="font-size:12px; color:var(--text-muted);">${a.created_at}</span>
                     </div>
@@ -122,14 +133,22 @@
         async function loadProducts() {
             showView('view-products');
             const prods = await apiCall('get_store_products');
-            document.getElementById('prod-tbody').innerHTML = prods.map(p => `
+            document.getElementById('prod-tbody').innerHTML = prods.map(p => {
+                const imgSrc = p.image_path ? `../${p.image_path}` : '';
+                const imgCell = imgSrc 
+                    ? `<img src="${imgSrc}" alt="${p.name}" style="width:40px; height:40px; object-fit:cover; border-radius:var(--radius-sm); border:1px solid var(--card-border);">` 
+                    : `<div class="product-img-placeholder" style="width:40px; height:40px; font-size:14px; margin-bottom:0; border-radius:var(--radius-sm);">${(p.name || 'P').charAt(0).toUpperCase()}</div>`;
+
+                return `
                 <tr>
+                    <td>${imgCell}</td>
                     <td style="font-family:monospace; color:var(--text-muted);">${p.sku}</td>
                     <td style="font-weight:600;">${p.name}</td>
                     <td><span class="badge badge-neutral">${p.category_name}</span></td>
                     <td style="font-weight:800; color:${p.stock <= p.low_stock_threshold ? 'var(--danger)' : 'var(--success)'};">${p.stock}</td>
-                    <td>${p.stock > 0 ? 'Available' : 'Out of Stock'}</td>
-                </tr>`).join('');
+                    <td><span class="badge ${p.stock > 0 ? 'badge-success' : 'badge-danger'}">${p.stock > 0 ? 'In Stock' : 'Out of Stock'}</span></td>
+                </tr>`;
+            }).join('');
         }
 
         async function loadOrders() {
@@ -137,7 +156,7 @@
             const orders = await apiCall('get_orders');
             document.getElementById('orders-tbody').innerHTML = orders.map(o => {
                 const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
-                let selectHtml = `<select onchange="updateStatus(${o.id}, this.value)" style="padding:8px; width:auto;">`;
+                let selectHtml = `<select onchange="updateStatus(${o.id}, this.value)" style="padding:8px 12px; width:auto; border-radius:var(--radius-sm); font-size:14px;">`;
                 statuses.forEach(s => {
                     selectHtml += `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`;
                 });
@@ -152,8 +171,8 @@
                 <tr>
                     <td style="font-weight:700;">#${o.id}</td>
                     <td>
-                        <div>${o.customer_name}</div>
-                        <div style="font-size:12px; color:var(--text-muted);">${o.customer_phone}</div>
+                        <div style="font-weight:600;">${o.customer_name}</div>
+                        <div style="font-size:12px; color:var(--text-muted);">${o.customer_phone || ''}</div>
                     </td>
                     <td style="font-weight:700;">${formatINR(o.total_amount)}</td>
                     <td>
@@ -168,12 +187,12 @@
         }
 
         async function updateStatus(orderId, status) {
-            const res = await apiCall('update_order_status', { order_id: orderId, status: status });
+            const res = await apiCall('update_order', { id: orderId, status: status });
             if(res.success) {
                 showToast(`Order #${orderId} updated to ${status}`);
                 loadOrders();
             } else {
-                showToast(res.error, 'error');
+                showToast(res.error || 'Failed to update order.', 'error');
                 loadOrders();
             }
         }

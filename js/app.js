@@ -21,23 +21,37 @@ function showToast(message, type = 'success') {
 }
 
 function formatINR(number) {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(number);
+    const val = Number(number) || 0;
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(val);
 }
 
 async function apiCall(action, payload = null) {
     const options = { method: payload ? 'POST' : 'GET' };
     if (payload) {
-        options.headers = { 'Content-Type': 'application/json' };
-        options.body = JSON.stringify(payload);
+        if (payload instanceof FormData) {
+            // Note: Do NOT set Content-Type header manually for FormData.
+            // The browser will automatically set 'multipart/form-data; boundary=...'
+            options.body = payload;
+        } else {
+            options.headers = { 'Content-Type': 'application/json' };
+            options.body = JSON.stringify(payload);
+        }
     }
     const prefix = window.location.pathname.includes('/admin/') || window.location.pathname.includes('/staff/') ? '../' : '';
     
     try {
         const response = await fetch(`${prefix}api/api.php?action=${action}`, options);
-        return await response.json();
+        const text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch (jsonErr) {
+            console.error("Non-JSON Server Output:", text);
+            const cleanText = text.replace(/<[^>]*>/g, '').trim();
+            return { success: false, error: cleanText.slice(0, 200) || 'Server returned an invalid response.' };
+        }
     } catch (e) {
-        console.error("API Error:", e);
-        return { success: false, error: 'Network error occurred.' };
+        console.error("Network Error:", e);
+        return { success: false, error: 'Network error occurred. Please check that WAMP Server is running.' };
     }
 }
 
@@ -71,7 +85,8 @@ function showView(viewId) {
     const activeView = document.getElementById(viewId);
     if(activeView) activeView.style.display = 'block';
     
-    // Highlight sidebar
-    const activeLink = document.querySelector(`.sidebar-link[onclick*="${viewId.replace('view-', '')}"]`);
+    // Highlight sidebar item matching the viewId
+    const actionKey = viewId.replace('view-', '');
+    const activeLink = document.querySelector(`.sidebar-link[onclick*="${actionKey}"]`);
     if(activeLink) activeLink.classList.add('active');
 }

@@ -1,4 +1,4 @@
-# 7Heven - E-Commerce Inventory & Order Management System
+# Inventra - E-Commerce Inventory & Order Management System
 
 A modern, high-performance E-Commerce platform and Inventory Management System built with a decoupled architecture. Features a responsive customer storefront, a secure staff portal, and a comprehensive admin dashboard with real-time analytics.
 
